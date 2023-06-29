@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/fullpage.js@3/dist/fullpage.min.css" />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://unpkg.com/fullpage.js@3/dist/fullpage.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-columnizer@1.6.3/src/jquery.columnizer.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div id="fullpage"></div>
+
+    <div id="content">
+        <!-- Paragraphs with associated images have a "data-image" attribute -->
+        <p data-image="image1">This is a paragraph associated with image 1. This is a paragraph with no associated image. This is a paragraph with no associated image. This is a paragraph with no associated image. This is a paragraph with no associated image. This is a paragraph with no associated image.This is a paragraph with no associated image.</p>
+        <p>This is a paragraph with no associated image. This is a paragraph with no associated image. This is a paragraph with no associated image. This is a paragraph with no associated image.</p>
+        <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, a at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal  at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktopdistribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktops opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
+        <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of l a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
+        <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at itved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
+        <h3>Sub-title here</h3>
+        <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of l a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
+        <p data-image="image2">This is a paragraph associated with image 2.</p>
+        
+        <!-- Images have an "id" matching the "data-image" of their associated paragraph -->
+        <div id="image1" class="hidden-image"><img src="https://images.saymedia-content.com/.image/c_limit%2Ccs_srgb%2Cq_auto:eco%2Cw_700/MTk2NzY3MjA5ODc0MjY5ODI2/top-10-cutest-cat-photos-of-all-time.webp" alt="Image 1"></div>
+        <div id="image2" class="hidden-image"><img src="https://images.saymedia-content.com/.image/c_limit%2Ccs_srgb%2Cq_auto:eco%2Cw_700/MTk2NzY3MjA5ODc0MjY5ODI2/top-10-cutest-cat-photos-of-all-time.webp" alt="Image 2"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$(document).ready(function() {
+    splitContentIntoSections();
+
+    $(window).resize(function() {
+        location.reload();
+    });
+});
+
+function splitTextIntoPages(text, linesPerPage, charsPerLine) {
+    const lines = Math.ceil(text.length / charsPerLine);
+    const pages = Math.ceil(lines / linesPerPage);
+    const textPages = new Array(pages).fill('').map((_, i) => {
+        const start = i * linesPerPage * charsPerLine;
+        const end = start + linesPerPage * charsPerLine;
+        return text.slice(start, end);
+    });
+    return textPages;
+}
+
+function splitContentIntoSections() {
+    const paragraphs = $('#content p');
+    const avgCharWidth = 18;
+    const lineHeight = 42;
+    const pageHeight = $(window).height() - parseInt($('body').css('fontSize')) * 2;
+    const columnWidth = $(window).width() / 2 - parseInt($('body').css('fontSize')) * 2;
+    const linesPerPage = Math.floor(pageHeight / lineHeight);
+    const charsPerLine = Math.floor(columnWidth / avgCharWidth);
+    let sectionId = 0;
+    let sectionContent = '<div class="text-column">';
+    let line = 0;
+
+    paragraphs.each((i, element) => {
+        const text = $(element).text();
+        const textPages = splitTextIntoPages(text, linesPerPage, charsPerLine);
+
+        textPages.forEach((page, i) => {
+            const currentLines = page.length / charsPerLine;
+
+            if (line + currentLines <= linesPerPage) {
+                sectionContent += `<p>${page}</p>`;
+                line += currentLines;
+            } else {
+                $('#fullpage').append(`<div class="section" id="section${sectionId}">${sectionContent}</div>`);
+
+                sectionContent = '<div class="text-column"><p>' + page + '</p>';
+                line = currentLines;
+                sectionId++;
+            }
+        });
+
+        const imageId = $(element).data('image');
+        if (imageId && (sectionContent.indexOf('image-column') === -1)) {
+            sectionContent += '<div class="image-column">' + $('#' + imageId).html() + '</div>';
+        }
+    });
+
+    $('#fullpage').append(`<div class="section" id="section${sectionId}">${sectionContent}</div>`);
+    initFullPage();
+}
+
+function initFullPage() {
+    if (window.fullpage_api) {
+        window.fullpage_api.destroy('all');
+    }
+
+    $('#fullpage').fullpage({
+        verticalCentered: false,
+        paddingTop: '2rem',
+        paddingBottom: '2rem'
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+body {
+    font-size: 30px;
+    line-height: 1.4;
+    font-family: Crimson Pro, serif;
+}
+
+.section {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 5%;
+    box-sizing: border-box;
+}
+
+.text-column {
+    max-height: calc(100vh * 0.9); /* Adjust this value as per your requirements */
+    width: 50%;
+}
+
+.image-column {
+    width: 50%;
+    max-height: calc(100vh * 0.9); /* Adjust this value as per your requirements */
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+@media (max-width: 800px) {
+    .section {
+        flex-direction: column;
+    }
+
+    .text-column, .image-column {
+        width: 100%;
+    }
+}
+
+
+
+
+
