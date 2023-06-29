@@ -1,0 +1,44 @@
+body {
+    font-size: 24px;
+    line-height: 1.4;
+    font-family: Crimson Pro, serif;
+}
+
+.section {
+ padding: 3rem;
+    box-sizing: border-box;
+}
+
+p {
+    text-indent: 2rem;
+    margin:  0;
+}
+
+h1 {
+    margin-bottom: 1rem;
+    margin-top: 0rem;
+}
+
+h3 {
+    margin-top: 1rem;
+    margin-bottom: 0rem;
+}
+
+.continued {
+    text-indent: 0;
+}
+
+
+@media (min-width: 800px) {
+    .section {
+        column-count: 2;
+        column-gap: 3rem;
+    }
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
